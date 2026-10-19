@@ -9,6 +9,7 @@
   <Project Path="GravitationalLens/GravitationalLens.csproj">
     <BuildDependency Project="GravitationalLens.Shader/GravitationalLens.Shader.vcxproj" />
   </Project>
+  <Project Path="GravitationalLens.Tests/GravitationalLens.Tests.csproj" />
   <Project Path="GravitationalLens.Shader/GravitationalLens.Shader.vcxproj">
     <BuildType Solution="*|*" Project="Release" />
     <Platform Solution="*|*" Project="Win32" />
