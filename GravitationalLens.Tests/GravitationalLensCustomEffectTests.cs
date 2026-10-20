@@ -91,15 +91,10 @@ public sealed class GravitationalLensCustomEffectTests
     }
 
     [Theory]
-    [InlineData(-1f, 1e-4f)]
-    [InlineData(0f, 1e-4f)]
-    [InlineData(0.5f, 0.5f)]
-    [InlineData(3.7f, 3.7f)]
-    [InlineData(1e5f, 1e4f)]
-    [InlineData(float.PositiveInfinity, 1e4f)]
-    [InlineData(float.NegativeInfinity, 1e-4f)]
-    [InlineData(float.NaN, 1f)]
-    public void TheHalfFieldTangentStaysPositiveAndFinite(float value, float expected)
+    [InlineData(0.5f)]
+    [InlineData(1f)]
+    [InlineData(3.7f)]
+    public void TheHalfFieldTangentKeepsValuesInsideTheFieldOfViewLimits(float value)
     {
         using var devices = new GraphicsDevices();
         using var context = devices.CreateContext();
@@ -107,15 +102,56 @@ public sealed class GravitationalLensCustomEffectTests
 
         effect.HalfFieldTangent = value;
 
-        Assert.Equal(expected, Read(effect, PropertyIndex.HalfFieldTangent));
+        Assert.Equal(value, Read(effect, PropertyIndex.HalfFieldTangent));
+    }
+
+    [Theory]
+    [InlineData(-1f)]
+    [InlineData(0f)]
+    [InlineData(float.NegativeInfinity)]
+    public void TheHalfFieldTangentNeverFallsBelowTheNarrowestFieldOfView(float value)
+    {
+        using var devices = new GraphicsDevices();
+        using var context = devices.CreateContext();
+        using var effect = new GravitationalLensCustomEffect(context);
+
+        effect.HalfFieldTangent = value;
+
+        Assert.Equal(GravitationalLensSettings.MinimumHalfFieldTangent, Read(effect, PropertyIndex.HalfFieldTangent));
+    }
+
+    [Theory]
+    [InlineData(4f)]
+    [InlineData(1e5f)]
+    [InlineData(float.PositiveInfinity)]
+    public void TheHalfFieldTangentNeverExceedsTheWidestFieldOfView(float value)
+    {
+        using var devices = new GraphicsDevices();
+        using var context = devices.CreateContext();
+        using var effect = new GravitationalLensCustomEffect(context);
+
+        effect.HalfFieldTangent = value;
+
+        Assert.Equal(GravitationalLensSettings.MaximumHalfFieldTangent, Read(effect, PropertyIndex.HalfFieldTangent));
+    }
+
+    [Fact]
+    public void ANonNumberLeavesTheHalfFieldTangentAtItsDefault()
+    {
+        using var devices = new GraphicsDevices();
+        using var context = devices.CreateContext();
+        using var effect = new GravitationalLensCustomEffect(context);
+
+        effect.HalfFieldTangent = float.NaN;
+
+        Assert.Equal(1f, Read(effect, PropertyIndex.HalfFieldTangent));
     }
 
     [Theory]
     [InlineData(-0.1f, 0f)]
     [InlineData(0.7f, 0.7f)]
-    [InlineData(10f, MathF.PI)]
     [InlineData(float.NaN, 0f)]
-    public void TheShadowAngleStaysWithinHalfATurn(float value, float expected)
+    public void TheShadowAngleStaysBetweenZeroAndTheShadowOfTheNearestDistance(float value, float expected)
     {
         using var devices = new GraphicsDevices();
         using var context = devices.CreateContext();
@@ -126,12 +162,25 @@ public sealed class GravitationalLensCustomEffectTests
         Assert.Equal(expected, Read(effect, PropertyIndex.ShadowAngle));
     }
 
+    [Fact]
+    public void AShadowWiderThanTheNearestDistanceAllowsIsCutBack()
+    {
+        using var devices = new GraphicsDevices();
+        using var context = devices.CreateContext();
+        using var effect = new GravitationalLensCustomEffect(context);
+
+        effect.ShadowAngle = 10f;
+
+        Assert.Equal((float)GravitationalLensSettings.MaximumShadowAngle, Read(effect, PropertyIndex.ShadowAngle));
+    }
+
     [Theory]
-    [InlineData(-100f, -64f)]
     [InlineData(-16.1f, -16.1f)]
-    [InlineData(100f, 64f)]
+    [InlineData(25f, 25f)]
     [InlineData(float.NaN, 0f)]
-    public void TheTableStartStaysWithinTheRangeOfLogarithms(float value, float expected)
+    [InlineData(float.PositiveInfinity, 0f)]
+    [InlineData(float.NegativeInfinity, 0f)]
+    public void TheTableStartMustBeFinite(float value, float expected)
     {
         using var devices = new GraphicsDevices();
         using var context = devices.CreateContext();
@@ -145,9 +194,10 @@ public sealed class GravitationalLensCustomEffectTests
     [Theory]
     [InlineData(-3f, 0f)]
     [InlineData(118.3f, 118.3f)]
-    [InlineData(1e9f, 1e4f)]
+    [InlineData(1e9f, 1e9f)]
     [InlineData(float.NaN, 0f)]
-    public void TheTableScaleStaysNonNegativeAndFinite(float value, float expected)
+    [InlineData(float.PositiveInfinity, 0f)]
+    public void TheTableScaleIsFiniteAndNeverNegative(float value, float expected)
     {
         using var devices = new GraphicsDevices();
         using var context = devices.CreateContext();

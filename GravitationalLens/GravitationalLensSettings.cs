@@ -14,6 +14,10 @@ internal static class GravitationalLensSettings
     public const double PositionSliderPixels = 1000.0;
     public const double RadiansPerDegree = Math.PI / 180.0;
 
+    public static readonly double MaximumShadowAngle = SchwarzschildOptics.GetShadowAngle(MinimumDistance);
+    public static readonly float MinimumHalfFieldTangent = GetHalfFieldOfViewTangent(MinimumFieldOfViewDegrees);
+    public static readonly float MaximumHalfFieldTangent = GetHalfFieldOfViewTangent(MaximumFieldOfViewDegrees);
+
     public static double ClampDistance(double distance)
         => Math.Clamp(distance, MinimumDistance, MaximumDistance);
 

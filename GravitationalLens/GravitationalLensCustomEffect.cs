@@ -29,12 +29,9 @@ internal sealed class GravitationalLensCustomEffect(IGraphicsDevicesAndContext d
     public float TableStart { set => SetValue((int)PropertyIndex.TableStart, value); }
     public float TableScale { set => SetValue((int)PropertyIndex.TableScale, value); }
 
+    private const float DefaultHalfFieldTangent = 1f;
+    private const float DefaultTableScale = 1f;
     private const float MaximumLensOffset = (float)GravitationalLensSettings.MaximumPositionPixels;
-    private const float MinimumHalfFieldTangent = 1e-4f;
-    private const float MaximumHalfFieldTangent = 1e4f;
-    private const float MaximumShadowAngle = MathF.PI;
-    private const float MaximumTableLogarithm = 64f;
-    private const float MaximumTableScale = 1e4f;
 
     [CustomEffect(2)]
     internal sealed class EffectImpl : D2D1CustomShaderEffectImplBase<EffectImpl>
@@ -52,21 +49,21 @@ internal sealed class GravitationalLensCustomEffect(IGraphicsDevicesAndContext d
         public float LensY { get => _cb.LensY; set { _cb.LensY = Sanitize(value, -MaximumLensOffset, MaximumLensOffset); UpdateConstants(); } }
 
         [CustomEffectProperty(PropertyType.Float, (int)PropertyIndex.HalfFieldTangent)]
-        public float HalfFieldTangent { get => _cb.HalfFieldTangent; set { _cb.HalfFieldTangent = float.IsNaN(value) ? 1f : Math.Clamp(value, MinimumHalfFieldTangent, MaximumHalfFieldTangent); UpdateConstants(); } }
+        public float HalfFieldTangent { get => _cb.HalfFieldTangent; set { _cb.HalfFieldTangent = float.IsNaN(value) ? DefaultHalfFieldTangent : Math.Clamp(value, GravitationalLensSettings.MinimumHalfFieldTangent, GravitationalLensSettings.MaximumHalfFieldTangent); UpdateConstants(); } }
 
         [CustomEffectProperty(PropertyType.Float, (int)PropertyIndex.ShadowAngle)]
-        public float ShadowAngle { get => _cb.ShadowAngle; set { _cb.ShadowAngle = Sanitize(value, 0f, MaximumShadowAngle); UpdateConstants(); } }
+        public float ShadowAngle { get => _cb.ShadowAngle; set { _cb.ShadowAngle = Sanitize(value, 0f, (float)GravitationalLensSettings.MaximumShadowAngle); UpdateConstants(); } }
 
         [CustomEffectProperty(PropertyType.Float, (int)PropertyIndex.TableStart)]
-        public float TableStart { get => _cb.TableStart; set { _cb.TableStart = Sanitize(value, -MaximumTableLogarithm, MaximumTableLogarithm); UpdateConstants(); } }
+        public float TableStart { get => _cb.TableStart; set { _cb.TableStart = float.IsFinite(value) ? value : 0f; UpdateConstants(); } }
 
         [CustomEffectProperty(PropertyType.Float, (int)PropertyIndex.TableScale)]
-        public float TableScale { get => _cb.TableScale; set { _cb.TableScale = Sanitize(value, 0f, MaximumTableScale); UpdateConstants(); } }
+        public float TableScale { get => _cb.TableScale; set { _cb.TableScale = float.IsFinite(value) ? Math.Max(value, 0f) : 0f; UpdateConstants(); } }
 
         public EffectImpl() : base(ShaderResourceUri.Get("GravitationalLens"))
         {
-            _cb.HalfFieldTangent = 1f;
-            _cb.TableScale = 1f;
+            _cb.HalfFieldTangent = DefaultHalfFieldTangent;
+            _cb.TableScale = DefaultTableScale;
             _cb.TableWidth = GravitationalLensSettings.TableWidth;
         }
 
