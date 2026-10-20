@@ -2,8 +2,11 @@ namespace GravitationalLens;
 
 internal static class SchwarzschildOptics
 {
-    private const double RfTolerance = 0.0025;
     private const int QuadratureOrder = 48;
+    private const int MaximumNewtonIterations = 100;
+
+    private static readonly double MachineEpsilon = Math.BitIncrement(1.0) - 1.0;
+    private static readonly double RfTolerance = Math.Pow(4.0 * MachineEpsilon, 1.0 / 6.0);
 
     private static readonly (double Node, double Weight)[] Quadrature = BuildQuadrature();
 
@@ -111,7 +114,7 @@ internal static class SchwarzschildOptics
         {
             var x = Math.Cos(Math.PI * (index + 0.75) / (QuadratureOrder + 0.5));
             var derivative = 1.0;
-            for (var iteration = 0; iteration < 100; iteration++)
+            for (var iteration = 0; iteration < MaximumNewtonIterations; iteration++)
             {
                 double previous = 1.0, current = x;
                 for (var degree = 2; degree <= QuadratureOrder; degree++)
@@ -124,7 +127,7 @@ internal static class SchwarzschildOptics
                 derivative = QuadratureOrder * (x * current - previous) / (x * x - 1.0);
                 var step = current / derivative;
                 x -= step;
-                if (Math.Abs(step) < 1e-15)
+                if (Math.Abs(step) < MachineEpsilon)
                     break;
             }
 
