@@ -5,6 +5,8 @@ internal static class GravitationalLensShaderModel
     const double EdgeWidth = 1.5;
     const double SingleSampleLimit = 1.5;
     const double FourSampleLimit = 4.0;
+    const double ShadowEdgeFootprint = 2.0 * FourSampleLimit;
+    const int SamplesPerAxis = 4;
     const double TwoPi = 2.0 * Math.PI;
 
     public static Bgra Shade(Func<int, int, Bgra> premultipliedSource, int x, int y, int width, int height, double lensX, double lensY, double halfFieldTangent, GravitationalLensTable table, double amount)
@@ -20,7 +22,7 @@ internal static class GravitationalLensShaderModel
         var (lensed, stretch) = Trace(premultipliedSource, width, height, position, center, lens, focal, table);
         if (stretch > SingleSampleLimit)
         {
-            var count = stretch > FourSampleLimit ? 4 : 2;
+            var count = stretch > FourSampleLimit ? SamplesPerAxis : SamplesPerAxis / 2;
             var sum = new double[4];
             for (var row = 0; row < count; row++)
             {
@@ -49,7 +51,7 @@ internal static class GravitationalLensShaderModel
         var crossY = -focal * delta.X;
         var crossZ = p.X * c.Y - p.Y * c.X;
         var viewAngle = Math.Atan2(Math.Sqrt(crossX * crossX + crossY * crossY + crossZ * crossZ), p.X * c.X + p.Y * c.Y + focal * focal);
-        var stretch = viewAngle <= table.ShadowAngle + EdgeWidth / focal ? (viewAngle <= table.ShadowAngle ? 0.0 : 5.0) : 0.0;
+        var stretch = viewAngle <= table.ShadowAngle + EdgeWidth / focal ? (viewAngle <= table.ShadowAngle ? 0.0 : ShadowEdgeFootprint) : 0.0;
         if (viewAngle <= table.ShadowAngle)
             return ([0.0, 0.0, 0.0, 255.0], stretch);
 

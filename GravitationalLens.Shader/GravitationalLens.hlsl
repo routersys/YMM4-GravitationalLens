@@ -16,19 +16,24 @@ cbuffer Constants : register(b0)
 };
 
 static const float Pi = 3.14159265358979;
-static const float TwoPi = 6.28318530717959;
-static const float EdgeWidth = 1.5;
-static const float SingleSampleLimit = 1.5;
-static const float FourSampleLimit = 4.0;
+static const float TwoPi = 2.0 * Pi;
+static const float HalfPixel = 0.5;
+static const float MinimumDepth = 1e-3;
+static const float ShadowEdgeWidth = 1.5;
+static const float SingleSampleFootprint = 1.5;
+static const float FourSampleFootprint = 4.0;
+static const float ShadowEdgeFootprint = 2.0 * FourSampleFootprint;
+static const int SamplesPerAxis = 4;
+static const int MaximumSamples = SamplesPerAxis * SamplesPerAxis;
 
 float ReadTable(float index)
 {
-    return TableTexture.SampleLevel(TableSampler, float2((index + 0.5) / tableWidth, 0.5), 0).x;
+    return TableTexture.SampleLevel(TableSampler, float2((index + HalfPixel) / tableWidth, HalfPixel), 0).x;
 }
 
 float LookUp(float separation, out float slope)
 {
-    float position = clamp((log(max(separation, exp(tableStart))) - tableStart) * tableScale, 0.0, tableWidth - 1.0);
+    float position = clamp((log(separation) - tableStart) * tableScale, 0.0, tableWidth - 1.0);
     float lower = min(floor(position), tableWidth - 2.0);
     float first = ReadTable(lower);
     float second = ReadTable(lower + 1.0);
@@ -36,41 +41,39 @@ float LookUp(float separation, out float slope)
     return lerp(first, second, position - lower);
 }
 
-float4 Trace(float2 position, float2 anchor, float4 uv0, float2 center, float2 lens, float3 lensDirection, float lensLength, float focal, out float stretch)
+float4 Trace(float2 position, float2 anchor, float4 uv0, float2 center, float2 lens, float3 lensDirection, float lensLength, float focal, out float footprint)
 {
-    float2 p = position - center;
-    float2 c = lens - center;
-    float2 delta = p - c;
-    float3 crossVector = float3(focal * delta.y, -focal * delta.x, p.x * c.y - p.y * c.x);
+    float2 viewOffset = position - center;
+    float2 lensRelative = lens - center;
+    float2 delta = viewOffset - lensRelative;
+    float3 crossVector = float3(focal * delta.y, -focal * delta.x, viewOffset.x * lensRelative.y - viewOffset.y * lensRelative.x);
     float crossLength = length(crossVector);
-    float dotProduct = dot(p, c) + focal * focal;
+    float dotProduct = dot(viewOffset, lensRelative) + focal * focal;
     float viewAngle = atan2(crossLength, dotProduct);
-    if (viewAngle <= shadowAngle + EdgeWidth / focal)
-        stretch = (viewAngle <= shadowAngle) ? 0.0 : 5.0;
-    else
-        stretch = 0.0;
-
-    if (viewAngle <= shadowAngle)
+    bool inShadow = viewAngle <= shadowAngle;
+    bool nearShadowEdge = viewAngle <= shadowAngle + ShadowEdgeWidth / focal;
+    footprint = (nearShadowEdge && !inShadow) ? ShadowEdgeFootprint : 0.0;
+    if (inShadow)
         return float4(0.0, 0.0, 0.0, 1.0);
 
     float separation = viewAngle - shadowAngle;
     float slope;
     float sourceAngle = LookUp(separation, slope);
     float folded = sourceAngle - TwoPi * floor((sourceAngle + Pi) / TwoPi);
-    float3 viewVector = float3(p, focal);
+    float3 viewVector = float3(viewOffset, focal);
     float viewLength = length(viewVector);
-    float norm = viewLength * lensLength;
-    float sine = crossLength / norm;
-    float cosine = dotProduct / norm;
+    float lengthProduct = viewLength * lensLength;
+    float sineView = crossLength / lengthProduct;
+    float cosineView = dotProduct / lengthProduct;
     float sineFolded;
     float cosineFolded;
     sincos(folded, sineFolded, cosineFolded);
-    float sineDifference = sine * cosineFolded - cosine * sineFolded;
-    float3 sourceDirection = (sineDifference * lensDirection + (sineFolded / viewLength) * viewVector) / sine;
-    float2 sourcePosition = center + focal * sourceDirection.xy / max(sourceDirection.z, 1e-3);
-    float2 clamped = clamp(sourcePosition, inputBounds.xy + 0.5, inputBounds.zw - 0.5);
+    float sineDifference = sineView * cosineFolded - cosineView * sineFolded;
+    float3 sourceDirection = (sineDifference * lensDirection + (sineFolded / viewLength) * viewVector) / sineView;
+    float2 sourcePosition = center + focal * sourceDirection.xy / max(sourceDirection.z, MinimumDepth);
+    float2 clamped = clamp(sourcePosition, inputBounds.xy + HalfPixel, inputBounds.zw - HalfPixel);
     float2 uv = uv0.xy + (clamped - anchor) * uv0.zw;
-    stretch = max(stretch, max(abs(slope) / separation, abs(sineFolded) / sine));
+    footprint = max(footprint, max(abs(slope) / separation, abs(sineFolded) / sineView));
     return SourceTexture.SampleLevel(SourceSampler, uv, 0);
 }
 
@@ -92,34 +95,34 @@ float4 main(
     float3 lensDirection = lensVector / lensLength;
     float4 lensed = float4(0.0, 0.0, 0.0, 0.0);
     float4 sum = float4(0.0, 0.0, 0.0, 0.0);
-    float count = 1.0;
+    float axisSamples = 1.0;
     float2 offset = float2(0.0, 0.0);
     [loop]
-    for (int iteration = 0; iteration <= 16; iteration++)
+    for (int iteration = 0; iteration <= MaximumSamples; iteration++)
     {
-        float stretch;
-        float4 color = Trace(scenePosition.xy + offset, scenePosition.xy, uv0, center, lens, lensDirection, lensLength, focal, stretch);
+        float footprint;
+        float4 color = Trace(scenePosition.xy + offset, scenePosition.xy, uv0, center, lens, lensDirection, lensLength, focal, footprint);
         if (iteration == 0)
         {
             lensed = color;
-            if (stretch <= SingleSampleLimit)
+            if (footprint <= SingleSampleFootprint)
                 break;
 
-            count = stretch > FourSampleLimit ? 4.0 : 2.0;
+            axisSamples = footprint > FourSampleFootprint ? SamplesPerAxis : SamplesPerAxis / 2;
         }
         else
         {
             sum += color;
-            if (iteration >= count * count)
+            if (iteration >= axisSamples * axisSamples)
             {
-                lensed = sum / (count * count);
+                lensed = sum / (axisSamples * axisSamples);
                 break;
             }
         }
 
-        float row = floor(iteration / count);
-        float column = iteration - row * count;
-        offset = (float2(column, row) + 0.5) / count - 0.5;
+        float row = floor(iteration / axisSamples);
+        float column = iteration - row * axisSamples;
+        offset = (float2(column, row) + 0.5) / axisSamples - 0.5;
     }
 
     return lerp(source, lensed, amount);
