@@ -1,3 +1,19 @@
 Key,Parameter,ja-jp,en-us,zh-cn,zh-tw,ko-kr,es-es,ar-sa,id-id
-GravitationalLens,,GravitationalLens,GravitationalLens,GravitationalLens,GravitationalLens,GravitationalLens,GravitationalLens,GravitationalLens,GravitationalLens
+GravitationalLens,,重力レンズ,Gravitational Lens,引力透镜,重力透鏡,중력 렌즈,Lente gravitacional,عدسة الجاذبية,Lensa Gravitasi
+BasicGroup,,基本,Basic,基本,基本,기본,Básico,الأساسية,Dasar
+BlackHoleGroup,,ブラックホール,Black Hole,黑洞,黑洞,블랙홀,Agujero negro,ثقب أسود,Lubang Hitam
+CameraGroup,,カメラ,Camera,相机,相機,카메라,Cámara,الكاميرا,Kamera
+Amount,,強さ,Amount,强度,強度,강도,Cantidad,الشدة,Jumlah
+AmountDescription,,元の映像に重力レンズの効果をかける量です,Amount of the gravitational lens effect applied to the source,对原始图像施加引力透镜效果的量,對原始影像施加重力透鏡效果的量,원본 영상에 중력 렌즈 효과를 적용하는 양입니다,Cantidad del efecto de lente gravitacional aplicado al original,مقدار تأثير عدسة الجاذبية المطبق على الصورة الأصلية,Jumlah efek lensa gravitasi yang diterapkan pada gambar asli
+PositionX,,位置X,Position X,位置X,位置X,위치 X,Posición X,الموضع X,Posisi X
+PositionXDescription,,ブラックホールの横位置です。映像の中心から右へ動かす距離で、単位は画素です,"Horizontal position of the black hole. Distance moved to the right from the center of the image, in pixels",黑洞的水平位置。从图像中心向右移动的距离，单位为像素,黑洞的水平位置。從影像中心向右移動的距離，單位為像素,블랙홀의 가로 위치입니다. 영상 중심에서 오른쪽으로 옮기는 거리이며 단위는 픽셀입니다,"Posición horizontal del agujero negro. Distancia hacia la derecha desde el centro de la imagen, en píxeles",الموضع الأفقي للثقب الأسود. المسافة إلى اليمين من مركز الصورة بالبكسل,"Posisi horizontal lubang hitam. Jarak ke kanan dari pusat gambar, dalam piksel"
+PositionY,,位置Y,Position Y,位置Y,位置Y,위치 Y,Posición Y,الموضع Y,Posisi Y
+PositionYDescription,,ブラックホールの縦位置です。映像の中心から下へ動かす距離で、単位は画素です,"Vertical position of the black hole. Distance moved down from the center of the image, in pixels",黑洞的垂直位置。从图像中心向下移动的距离，单位为像素,黑洞的垂直位置。從影像中心向下移動的距離，單位為像素,블랙홀의 세로 위치입니다. 영상 중심에서 아래쪽으로 옮기는 거리이며 단위는 픽셀입니다,"Posición vertical del agujero negro. Distancia hacia abajo desde el centro de la imagen, en píxeles",الموضع الرأسي للثقب الأسود. المسافة إلى الأسفل من مركز الصورة بالبكسل,"Posisi vertikal lubang hitam. Jarak ke bawah dari pusat gambar, dalam piksel"
+Distance,,距離,Distance,距离,距離,거리,Distancia,المسافة,Jarak
+DistanceDescription,,ブラックホールまでの距離です。シュワルツシルト半径の何倍かで指定します。小さいほど、ブラックホールシャドウと光のゆがみが大きくなります,"Distance to the black hole, given as a multiple of the Schwarzschild radius. Smaller values make the black hole shadow and the distortion of light larger",到黑洞的距离，以史瓦西半径的倍数表示。数值越小，黑洞阴影和光的扭曲越大,到黑洞的距離，以史瓦西半徑的倍數表示。數值越小，黑洞陰影與光線的扭曲越大,블랙홀까지의 거리이며 슈바르츠실트 반지름의 몇 배인지로 지정합니다. 값이 작을수록 블랙홀 그림자와 빛의 왜곡이 커집니다,"Distancia al agujero negro, expresada como múltiplo del radio de Schwarzschild. Los valores menores agrandan la sombra del agujero negro y la distorsión de la luz",المسافة إلى الثقب الأسود مقدرة بمضاعفات نصف قطر شوارزشيلد. كلما قلّت القيمة زاد حجم ظل الثقب الأسود وتشوّه الضوء,"Jarak ke lubang hitam, dinyatakan sebagai kelipatan jari-jari Schwarzschild. Nilai yang lebih kecil memperbesar bayangan lubang hitam dan distorsi cahaya"
+FieldOfView,,画角,Field of View,视角,視角,화각,Campo visual,مجال الرؤية,Bidang Pandang
+FieldOfViewDescription,,カメラの横方向の画角です。大きいほど、同じ映像に広い範囲が写ります,Horizontal field of view of the camera. Larger values show a wider area in the same image,相机的水平视角。数值越大，同一图像中拍到的范围越广,相機的水平視角。數值越大，同一影像中拍到的範圍越廣,카메라의 가로 화각입니다. 값이 클수록 같은 영상에 더 넓은 범위가 담깁니다,Campo visual horizontal de la cámara. Los valores mayores muestran una zona más amplia en la misma imagen,مجال الرؤية الأفقي للكاميرا. كلما زادت القيمة ظهرت منطقة أوسع في الصورة نفسها,Bidang pandang horizontal kamera. Nilai yang lebih besar menampilkan area yang lebih luas pada gambar yang sama
+TagGravitationalLens,,重力レンズ,Gravitational Lens,引力透镜,重力透鏡,중력 렌즈,Lente gravitacional,عدسة الجاذبية,Lensa Gravitasi
+TagBlackHole,,ブラックホール,Black Hole,黑洞,黑洞,블랙홀,Agujero negro,ثقب أسود,Lubang Hitam
+TagDistortion,,ゆがみ,Distortion,扭曲,扭曲,왜곡,Distorsión,تشويه,Distorsi
 UpdateAvailableMessage,,新しいバージョン {0} が公開されています。,A new version {0} is available.,已发布新版本 {0}。,已發布新版本 {0}。,새 버전 {0}이(가) 공개되었습니다.,La nueva versión {0} está disponible.,الإصدار الجديد {0} متاح الآن.,Versi baru {0} telah tersedia.
