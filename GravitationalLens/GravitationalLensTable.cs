@@ -29,11 +29,11 @@ internal sealed class GravitationalLensTable
         var last = Math.Log(Math.PI - shadow);
         var step = (last - first) / (width - 1);
         var values = new float[width];
-        for (var index = 0; index < width; index++)
+        Parallel.For(0, width, index =>
         {
             var angle = Math.Min(shadow + Math.Exp(first + index * step), Math.PI);
             values[index] = (float)SchwarzschildOptics.GetSourceAngle(distance, angle);
-        }
+        });
 
         return new GravitationalLensTable(distance, shadow, first, step, values);
     }

@@ -297,4 +297,20 @@ public sealed class SchwarzschildOpticsTests
         Assert.Equal(table.Values[0], table.GetSourceAngle(table.ShadowAngle), 1e-6);
         Assert.Equal(table.Values[0], table.GetSourceAngle(table.ShadowAngle - 0.1), 1e-6);
     }
+
+    [Theory]
+    [InlineData(3.0)]
+    [InlineData(12.0)]
+    [InlineData(250.0)]
+    [InlineData(1000.0)]
+    public void EveryTableEntryEqualsItsSequentialEvaluationBitForBit(double distance)
+    {
+        var table = GravitationalLensTable.Build(distance);
+
+        for (var index = 0; index < table.Values.Length; index++)
+        {
+            var angle = Math.Min(table.ShadowAngle + Math.Exp(table.LogStart + index * table.LogStep), Math.PI);
+            Assert.Equal((float)SchwarzschildOptics.GetSourceAngle(distance, angle), table.Values[index]);
+        }
+    }
 }
