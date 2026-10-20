@@ -61,6 +61,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Resource Include="$(ShaderDirPath)GravitationalLens.cso" Link="Resources\Shader\GravitationalLens.cso" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<Compile Include="..\YMM4-GitHubUpdateNotifier\GitHubUpdateNotifier\*.cs" LinkBase="GitHubUpdateNotifier" />
 	</ItemGroup>
 
