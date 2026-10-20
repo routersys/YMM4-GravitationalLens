@@ -1,0 +1,126 @@
+{
+  "adapter": "Intel(R) Iris(R) Xe Graphics",
+  "driver": "32.0.101.7085",
+  "input": "synthetic 640x480 89838D8976198E40",
+  "canvas": "1280x720",
+  "cases": [
+    {
+      "name": "default",
+      "frames": [
+        0
+      ],
+      "hash": "0BD1C78AB10109D176B86FAAD972F507EF5FDC6D496C757F12513D77251CCF82"
+    },
+    {
+      "name": "distance-animated-frames",
+      "frames": [
+        0,
+        100,
+        200,
+        299
+      ],
+      "hash": "DA1B51FA2C1537405F3FD10D9BB7559FCAFD96F117BB7B5FA83DEDA27A360A44"
+    },
+    {
+      "name": "position-x-animated-frames",
+      "frames": [
+        0,
+        100,
+        200,
+        299
+      ],
+      "hash": "144E8D2BCAC6199CEFC08395CD6D25E06B06A4F49B71D3A2FCA14B1291B19A1B"
+    },
+    {
+      "name": "amount-0",
+      "frames": [
+        0
+      ],
+      "hash": "0A700F76CEDDBAD7C4B6A2C19D46939C1A93940E86C6EFEF1E5A53DB48D2A020"
+    },
+    {
+      "name": "amount-50",
+      "frames": [
+        0
+      ],
+      "hash": "16B821D329A8DF18AC8960FD80804B053A73A6EE685712D172BD3DC862F14538"
+    },
+    {
+      "name": "position-x-minus-250",
+      "frames": [
+        0
+      ],
+      "hash": "BF64F252263CB3E76404A4CDDE06EC7E4673DA95BB4C5D343CA2CBE1AF55BFA5"
+    },
+    {
+      "name": "position-x-250",
+      "frames": [
+        0
+      ],
+      "hash": "5A8049B36F6D5B5783965E477DCA002ABA26570B4878B48AE81B4FF06F7EC133"
+    },
+    {
+      "name": "position-y-minus-150",
+      "frames": [
+        0
+      ],
+      "hash": "70FD03C87AB512E9619A6F0F3DFAF50628A3196DF6423E732729D8CAE9C97200"
+    },
+    {
+      "name": "position-y-150",
+      "frames": [
+        0
+      ],
+      "hash": "6CCA68C4E3130819954488CB4ECCF8BD9977167F0A5D57D867C64863E14626BE"
+    },
+    {
+      "name": "distance-5",
+      "frames": [
+        0
+      ],
+      "hash": "D7ABEB1E67D5059B8C95A566481501D70E4EB1530B5904490838456A9F4314FB"
+    },
+    {
+      "name": "distance-12",
+      "frames": [
+        0
+      ],
+      "hash": "88D5E6B9F9B6A6C5027D16A4CF7A1A86C223FC34AE08D385501F2B262C77E565"
+    },
+    {
+      "name": "distance-30",
+      "frames": [
+        0
+      ],
+      "hash": "5CBFD0B667CB74EDE2B0AD8729E414FC8638B2127EA3C87D480905A842D75AC4"
+    },
+    {
+      "name": "distance-300",
+      "frames": [
+        0
+      ],
+      "hash": "64DE96E3A3BBFDBE0886ABFD7F23DE48710105FBBD97A4D108F79ED798608049"
+    },
+    {
+      "name": "distance-1000",
+      "frames": [
+        0
+      ],
+      "hash": "63C0B9CBB94B75D571971103B2442EE539538D36E7A1A29484D7E6C1762A04D0"
+    },
+    {
+      "name": "field-of-view-25",
+      "frames": [
+        0
+      ],
+      "hash": "B2300622AEA86C8867E85BEB68FE247F0611819AF4C201609DF91DD107818C80"
+    },
+    {
+      "name": "field-of-view-110",
+      "frames": [
+        0
+      ],
+      "hash": "E06F3811F62EB83A7662CCC75EC7BD89DEA5FB7259E9DFB80EED9DA5408B04E8"
+    }
+  ]
+}
