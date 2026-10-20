@@ -54,7 +54,7 @@ YukkuriMovieMaker4（YMM4）上で動作する、ブラックホールの近く�
 
 表はシュワルツシルト時空の光の経路を楕円積分で解いて作ります。シュワルツシルト時空は回転しない球形のブラックホールの外側の時空です。ブラックホールまでの距離はシュワルツシルト半径の何倍かで指定します。シュワルツシルト半径は事象の地平線の半径です。
 
-光の経路の追跡は、James, von Tunzelmann, Franklin and Thorneの論文「Gravitational lensing by spinning black holes in astrophysics, and in the movie Interstellar」（Classical and Quantum Gravity、2015年）が示した、近くのカメラから遠くの空へ光線をたどる考え方を参照しています。この論文は回転するブラックホールを扱い、本プラグインは回転しないブラックホールを扱います。楕円積分の計算は、Carlsonの論文「Numerical computation of real or complex elliptic integrals」（Numerical Algorithms、1995年）が示した、対称形の楕円積分$R_F$の計算法に基づきます。
+光の経路の追跡はJames, von Tunzelmann, Franklin and Thorneの論文「Gravitational lensing by spinning black holes in astrophysics, and in the movie Interstellar」（Classical and Quantum Gravity、2015年）が示した、近くのカメラから遠くの空へ光線をたどる考え方を参照しています。この論文が扱うのは回転するブラックホールで、本プラグインが扱うのは回転しないブラックホールです。楕円積分の計算はCarlsonの論文「Numerical computation of real or complex elliptic integrals」（Numerical Algorithms、1995年）が示した、対称形の楕円積分$R_F$の計算法に基づきます。
 
 結果は設定と画素の位置だけから決まります。時間値と乱数は使いません。同じフレームは何度描いても同じ結果になります。
 
@@ -121,7 +121,7 @@ $$
 
 $\psi$が$\psi_{\mathrm{sh}}$以下の画素は、不透明な黒にします。$D$が大きいほど、シャドウは小さくなります。
 
-次の画像は、星空の画像に、すべての項目を既定値にして適用した例です。中央の黒い円がシャドウで、そのまわりで星が環のように引き伸ばされています。
+次の画像は星空の画像に、すべての項目を既定値にして適用した例です。中央の黒い円がシャドウで、そのまわりで星が環のように引き伸ばされています。
 
 ![Image](https://github.com/routersys/YMM4-GravitationalLens/blob/main/docs/GravitationalLens-Default.png)
 
