@@ -1,4 +1,7 @@
+using System.Collections.Immutable;
 using System.Globalization;
+using System.Numerics;
+using System.Windows.Input;
 using YukkuriMovieMaker.Commons;
 using YukkuriMovieMaker.Json;
 using YukkuriMovieMaker.Player.Video;
@@ -87,7 +90,7 @@ public sealed class GravitationalLensEffectProcessorTests
     static double FocalLength(double fieldOfView) => 0.5 * Width / GravitationalLensSettings.GetHalfFieldOfViewTangent(fieldOfView);
 
     [Fact]
-    public void TheProcessorHandsTheDrawDescriptionBackUnchanged()
+    public void TheProcessorOnlyAddsTheControllerToTheDrawDescription()
     {
         using var devices = new GraphicsDevices();
         using var context = devices.CreateContext();
@@ -98,7 +101,113 @@ public sealed class GravitationalLensEffectProcessorTests
 
         var draw = processor.Update(description);
 
-        Assert.Same(description.DrawDescription, draw);
+        Assert.Equal(description.DrawDescription with { Controllers = draw.Controllers }, draw);
+        Assert.Single(draw.Controllers);
+    }
+
+    [Fact]
+    public void TheControllerSitsOnTheBlackHoleAndBelongsToTheEffect()
+    {
+        using var devices = new GraphicsDevices();
+        using var context = devices.CreateContext();
+        var effect = Strong();
+        effect.PositionX.Values[0].Value = 14d;
+        effect.PositionY.Values[0].Value = -11d;
+        using var source = new SourceImage(context, Width, Height, Gradient);
+        using var processor = effect.CreateVideoEffect(context);
+        processor.SetInput(source.Bitmap);
+
+        var draw = processor.Update(EffectDescriptions.At(0, Length));
+
+        var controller = Assert.IsType<VideoEffectController>(Assert.Single(draw.Controllers));
+        Assert.Same(effect, controller.Owner);
+        var point = Assert.Single(controller.Points);
+        Assert.Equal(new Vector3(Width / 2f + 14f, Height / 2f - 11f, 0f), point.Position);
+    }
+
+    [Fact]
+    public void DraggingTheControllerMovesTheBlackHoleOnTheNextFrame()
+    {
+        using var devices = new GraphicsDevices();
+        using var context = devices.CreateContext();
+        var effect = Strong();
+        using var source = new SourceImage(context, Width, Height, Gradient);
+        using var processor = effect.CreateVideoEffect(context);
+        processor.SetInput(source.Bitmap);
+        var point = Assert.Single(Assert.Single(processor.Update(EffectDescriptions.At(0, Length)).Controllers).Points);
+
+        point.OnDrag!(new ControlPointDragEventArgs(new Vector3(9f, -6f, 0f), ModifierKeys.None));
+
+        Assert.Equal(9d, effect.PositionX.GetValue(0, Length, EffectDescriptions.Fps));
+        Assert.Equal(-6d, effect.PositionY.GetValue(0, Length, EffectDescriptions.Fps));
+        var moved = Assert.Single(Assert.Single(processor.Update(EffectDescriptions.At(0, Length)).Controllers).Points);
+        Assert.Equal(new Vector3(Width / 2f + 9f, Height / 2f - 6f, 0f), moved.Position);
+        AssertFollowsModel(Rendering.Capture(context, processor.Output), new Model(effect, 0), Gradient, "after the drag");
+    }
+
+    [Fact]
+    public void TheControllerFollowsAnAnimatedPosition()
+    {
+        using var devices = new GraphicsDevices();
+        using var context = devices.CreateContext();
+        var effect = Strong();
+        effect.PositionX.CopyFrom(Linear(-30d, 30d));
+        using var source = new SourceImage(context, Width, Height, Gradient);
+        using var processor = effect.CreateVideoEffect(context);
+        processor.SetInput(source.Bitmap);
+
+        var first = Assert.Single(Assert.Single(processor.Update(EffectDescriptions.At(0, Length)).Controllers).Points);
+        var last = Assert.Single(Assert.Single(processor.Update(EffectDescriptions.At(Length - 1, Length)).Controllers).Points);
+
+        Assert.Equal(Width / 2f - 30f, first.Position.X, 1e-3f);
+        Assert.Equal(Width / 2f + (float)effect.PositionX.GetValue(Length - 1, Length, EffectDescriptions.Fps), last.Position.X, 1e-3f);
+        Assert.True(last.Position.X > first.Position.X + 50f);
+    }
+
+    [Fact]
+    public void TheControllerStaysWithoutAnAmount()
+    {
+        using var devices = new GraphicsDevices();
+        using var context = devices.CreateContext();
+        using var source = new SourceImage(context, Width, Height, Gradient);
+        using var processor = Strong(0d).CreateVideoEffect(context);
+        processor.SetInput(source.Bitmap);
+
+        var draw = processor.Update(EffectDescriptions.At(0, Length));
+
+        Assert.Single(Assert.Single(draw.Controllers).Points);
+    }
+
+    [Fact]
+    public void TheControllersOfEarlierEffectsAreKeptInFront()
+    {
+        using var devices = new GraphicsDevices();
+        using var context = devices.CreateContext();
+        using var source = new SourceImage(context, Width, Height, Gradient);
+        var effect = Strong();
+        using var processor = effect.CreateVideoEffect(context);
+        processor.SetInput(source.Bitmap);
+        var earlier = new VideoEffectController(new GravitationalLensEffect(), [new ControllerPoint(Vector3.Zero)]);
+        var description = EffectDescriptions.At(0, Length);
+        description = description with { DrawDescription = description.DrawDescription with { Controllers = ImmutableList.Create<VideoEffectController>(earlier) } };
+
+        var draw = processor.Update(description);
+
+        Assert.Equal(2, draw.Controllers.Count);
+        Assert.Same(earlier, draw.Controllers[0]);
+        Assert.Same(effect, draw.Controllers[1].Owner);
+    }
+
+    [Fact]
+    public void WithoutAnInputNoControllerIsAdded()
+    {
+        using var devices = new GraphicsDevices();
+        using var context = devices.CreateContext();
+        using var processor = Strong().CreateVideoEffect(context);
+
+        var draw = processor.Update(EffectDescriptions.At(0, Length));
+
+        Assert.Empty(draw.Controllers);
     }
 
     [Fact]

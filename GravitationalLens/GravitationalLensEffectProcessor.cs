@@ -1,3 +1,5 @@
+using System.Collections.Immutable;
+using System.Numerics;
 using System.Runtime.InteropServices;
 using Vortice.Direct2D1;
 using Vortice.DCommon;
@@ -12,12 +14,15 @@ internal sealed class GravitationalLensEffectProcessor(IGraphicsDevicesAndContex
 {
     private const int TexelBytes = 4 * sizeof(float);
 
+    private readonly IGraphicsDevicesAndContext _devices = devices;
     private readonly GravitationalLensEffect _item = item;
     private GravitationalLensCustomEffect? _effect;
     private ID2D1Bitmap1? _table;
     private bool _isFirst = true;
     private double _distance;
     private ConstantKey _constantKey;
+    private ImmutableList<VideoEffectController> _controllers = [];
+    private Vector2 _controllerPosition = new(float.NaN, float.NaN);
 
     public override DrawDescription Update(EffectDescription effectDescription)
     {
@@ -41,6 +46,10 @@ internal sealed class GravitationalLensEffectProcessor(IGraphicsDevicesAndContex
         var length = effectDescription.ItemDuration.Frame;
         var fps = effectDescription.FPS;
         var amount = (float)(_item.Amount.GetValue(frame, length, fps) / 100.0);
+        var limit = GravitationalLensSettings.MaximumPositionPixels;
+        var lensX = (float)Math.Clamp(_item.PositionX.GetValue(frame, length, fps), -limit, limit);
+        var lensY = (float)Math.Clamp(_item.PositionY.GetValue(frame, length, fps), -limit, limit);
+        var draw = WithController(effectDescription.DrawDescription, lensX, lensY);
         if (_isFirst || _constantKey.Amount != amount)
             _effect.Amount = amount;
 
@@ -48,7 +57,7 @@ internal sealed class GravitationalLensEffectProcessor(IGraphicsDevicesAndContex
         {
             _constantKey = _constantKey with { Amount = amount };
             _isFirst = false;
-            return effectDescription.DrawDescription;
+            return draw;
         }
 
         var distance = GravitationalLensSettings.ClampDistance(_item.Distance.GetValue(frame, length, fps));
@@ -65,11 +74,10 @@ internal sealed class GravitationalLensEffectProcessor(IGraphicsDevicesAndContex
             tableScale = (float)(1.0 / table.LogStep);
         }
 
-        var limit = GravitationalLensSettings.MaximumPositionPixels;
         var constantKey = new ConstantKey(
             amount,
-            (float)Math.Clamp(_item.PositionX.GetValue(frame, length, fps), -limit, limit),
-            (float)Math.Clamp(_item.PositionY.GetValue(frame, length, fps), -limit, limit),
+            lensX,
+            lensY,
             GravitationalLensSettings.GetHalfFieldOfViewTangent(_item.FieldOfView.GetValue(frame, length, fps)),
             shadowAngle,
             tableStart,
@@ -89,7 +97,33 @@ internal sealed class GravitationalLensEffectProcessor(IGraphicsDevicesAndContex
 
         _constantKey = constantKey;
         _isFirst = false;
-        return effectDescription.DrawDescription;
+        return draw;
+    }
+
+    private DrawDescription WithController(DrawDescription draw, float lensX, float lensY)
+    {
+        if (input is null)
+            return draw;
+
+        var bounds = _devices.DeviceContext.GetImageLocalBounds(input);
+        var position = new Vector2((bounds.Left + bounds.Right) * 0.5f + lensX, (bounds.Top + bounds.Bottom) * 0.5f + lensY);
+        if (!float.IsFinite(position.X) || !float.IsFinite(position.Y))
+            return draw;
+
+        if (_controllerPosition != position)
+        {
+            var point = new ControllerPoint(new Vector3(position, 0f), OnDrag);
+            _controllers = [new VideoEffectController(_item, [point])];
+            _controllerPosition = position;
+        }
+
+        return draw with { Controllers = draw.Controllers.AddRange(_controllers) };
+    }
+
+    private void OnDrag(ControlPointDragEventArgs argument)
+    {
+        _item.PositionX.AddToEachValues(argument.Delta.X);
+        _item.PositionY.AddToEachValues(argument.Delta.Y);
     }
 
     private void WriteTable(float[] texels)
