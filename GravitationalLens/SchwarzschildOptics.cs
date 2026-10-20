@@ -36,7 +36,7 @@ internal static class SchwarzschildOptics
         var roots = Roots.Create(impact);
         var observer = Math.Min(1.0 / distance, roots.Periapsis);
         var sign = outgoing ? -1.0 : 1.0;
-        return 2.0 / Math.Sqrt(roots.OuterSpan) * (roots.Integral(0.0) + sign * roots.Integral(observer));
+        return 2.0 / Math.Sqrt(roots.OuterSpan) * (roots.IncompleteIntegral(0.0) + sign * roots.IncompleteIntegral(observer));
     }
 
     private static double GetSweepWithoutTurningPoint(double distance, double impact)
@@ -71,7 +71,7 @@ internal static class SchwarzschildOptics
                 2.0 * sine / root);
         }
 
-        public double Integral(double position)
+        public double IncompleteIntegral(double position)
         {
             var denominator = InnerSpan * (Highest - position);
             var sine2 = OuterSpan * (Periapsis - position) / denominator;
