@@ -58,12 +58,7 @@ YukkuriMovieMaker4（YMM4）上で動作する、ブラックホールの近く�
 
 表はシュワルツシルト時空の光の経路を楕円積分で解いて作ります。シュワルツシルト時空は回転しない球形のブラックホールの外側の時空です。ブラックホールまでの距離はシュワルツシルト半径の何倍かで指定します。シュワルツシルト半径は事象の地平線の半径です。
 
-本プラグインが依拠する資料は次のとおりです。
-
-- 光線がブラックホールの近くのカメラから遠くの空へ達するまでの追跡: James, von Tunzelmann, Franklin and Thorneの論文「Gravitational lensing by spinning black holes in astrophysics, and in the movie Interstellar」（Classical and Quantum Gravity、2015年）が示した、近くのカメラから遠くの空へ光線をたどる考え方を参照しています。この論文は回転するブラックホールを扱い、本プラグインは回転しないブラックホールを扱います。
-- 楕円積分の計算: Carlsonの論文「Numerical computation of real or complex elliptic integrals」（Numerical Algorithms、1995年）が示した、対称形の楕円積分R_Fの計算法に基づきます。
-- アインシュタインリングの大きさ: Einsteinの論文「Lens-like action of a star by the deviation of light in the gravitational field」（Science、1936年）が示した、レンズ天体の真後ろの光源が環に見える角度の式との一致を、試験で確かめています。
-- 光子球の付近の偏向角: Bozzaの論文「Gravitational lensing in the strong field limit」（Physical Review D、2002年）が示した、光子球の付近での偏向角の漸近式との一致を、試験で確かめています。
+光の経路の追跡は、James, von Tunzelmann, Franklin and Thorneの論文「Gravitational lensing by spinning black holes in astrophysics, and in the movie Interstellar」（Classical and Quantum Gravity、2015年）が示した、近くのカメラから遠くの空へ光線をたどる考え方を参照しています。この論文は回転するブラックホールを扱い、本プラグインは回転しないブラックホールを扱います。楕円積分の計算は、Carlsonの論文「Numerical computation of real or complex elliptic integrals」（Numerical Algorithms、1995年）が示した、対称形の楕円積分R_Fの計算法に基づきます。
 
 結果は設定と画素の位置だけから決まります。時間値と乱数は使いません。同じフレームは何度描いても同じ結果になります。
 
@@ -225,9 +220,9 @@ sはwからvの側へΘ'だけ回した向きです。Θ'が負のときは、w�
 - 映像の色はsRGBの値のまま混ぜます。平均と補間は、ガンマ補正を取り除かずに行います。
 - 光の経路の計算は次の方法で確かめています。
   - 光の曲がる角度が、弱い重力場の4項の展開式と、b = 200とb = 1000で1.0×10⁻⁸ラジアン以内で一致します。
-  - 光子球の付近の偏向角がBozzaの漸近式へ近づきます。衝突係数の臨界値からの超過分の割合をεとして、ε = 10⁻⁴、10⁻⁶、10⁻⁸のそれぞれで、差が 40ε|ln ε| + 1.0×10⁻⁶ ラジアン以内に収まることを確かめています。
+  - 光子球の付近の偏向角がBozzaの論文「Gravitational lensing in the strong field limit」（Physical Review D、2002年）の漸近式へ近づきます。衝突係数の臨界値からの超過分の割合をεとして、ε = 10⁻⁴、10⁻⁶、10⁻⁸のそれぞれで、差が 40ε|ln ε| + 1.0×10⁻⁶ ラジアン以内に収まることを確かめています。
   - 楕円積分で求めた折り返す光の角度が、別に書いたシンプソン法の数値積分と、1.0×10⁻⁹ラジアン以内で一致します。距離は3倍から1000倍まで、衝突係数は臨界値の1.2倍以上で確かめています。
-  - 距離が1000倍と10000倍のとき、アインシュタインリングの角度が数値積分の結果と、相対で1.0×10⁻⁹以内で一致します。距離が10⁸倍のとき、弱い重力場の展開式と相対で1.0×10⁻⁷以内で一致します。距離がDのとき、角度はEinsteinの式の√(2/D)に近づきます。差は、距離が1000倍で相対3.6%以内、10⁶倍で0.11%以内です。
+  - 距離が1000倍と10000倍のとき、アインシュタインリングの角度が数値積分の結果と、相対で1.0×10⁻⁹以内で一致します。距離が10⁸倍のとき、弱い重力場の展開式と相対で1.0×10⁻⁷以内で一致します。距離がDのとき、角度はEinsteinの論文「Lens-like action of a star by the deviation of light in the gravitational field」（Science、1936年）の式の√(2/D)に近づきます。差は、距離が1000倍で相対3.6%以内、10⁶倍で0.11%以内です。
   - 表を引き直した値との差は、距離が3倍、12倍、250倍、1000倍のとき、最大でも2.7×10⁻⁵ラジアンです。
 - 角度の表を引くときの精度は、32ビットの浮動小数点数とGPUの三角関数の精度で決まります。試験では128×96画素の描画のうち、CPUで書いた同じ式の描画と1チャンネルあたり3を超えて違う画素が、81個以下であることを確かめています。
 
