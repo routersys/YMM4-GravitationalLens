@@ -12,8 +12,6 @@ namespace GravitationalLens;
 
 internal sealed class GravitationalLensEffectProcessor(IGraphicsDevicesAndContext devices, GravitationalLensEffect item) : VideoEffectProcessorBase(devices)
 {
-    private const int TexelBytes = 4 * sizeof(float);
-
     private readonly IGraphicsDevicesAndContext _devices = devices;
     private readonly GravitationalLensEffect _item = item;
     private GravitationalLensCustomEffect? _effect;
@@ -131,7 +129,7 @@ internal sealed class GravitationalLensEffectProcessor(IGraphicsDevicesAndContex
         var handle = GCHandle.Alloc(texels, GCHandleType.Pinned);
         try
         {
-            _table!.CopyFromMemory(handle.AddrOfPinnedObject(), GravitationalLensSettings.TableWidth * TexelBytes);
+            _table!.CopyFromMemory(handle.AddrOfPinnedObject(), GravitationalLensSettings.TableWidth * GravitationalLensSettings.TexelBytes);
         }
         finally
         {
@@ -151,14 +149,14 @@ internal sealed class GravitationalLensEffectProcessor(IGraphicsDevicesAndContex
         _effect = effect;
         disposer.Collect(effect);
         var properties = new BitmapProperties1(new PixelFormat(Format.R32G32B32A32_Float, Vortice.DCommon.AlphaMode.Premultiplied), 96f, 96f, BitmapOptions.None);
-        var empty = new float[GravitationalLensSettings.TableWidth * 4];
+        var empty = new float[GravitationalLensSettings.TableWidth * GravitationalLensSettings.TexelChannels];
         var handle = GCHandle.Alloc(empty, GCHandleType.Pinned);
         try
         {
             _table = ((ID2D1DeviceContext1)devices.DeviceContext).CreateBitmap(
                 new Vortice.Mathematics.SizeI(GravitationalLensSettings.TableWidth, 1),
                 handle.AddrOfPinnedObject(),
-                GravitationalLensSettings.TableWidth * TexelBytes,
+                GravitationalLensSettings.TableWidth * GravitationalLensSettings.TexelBytes,
                 properties);
         }
         finally

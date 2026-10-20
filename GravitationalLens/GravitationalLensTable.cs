@@ -50,9 +50,9 @@ internal sealed class GravitationalLensTable
 
     public float[] ToTexels()
     {
-        var texels = new float[Values.Length * 4];
+        var texels = new float[Values.Length * GravitationalLensSettings.TexelChannels];
         for (var index = 0; index < Values.Length; index++)
-            texels[index * 4] = Values[index];
+            texels[index * GravitationalLensSettings.TexelChannels] = Values[index];
         return texels;
     }
 }

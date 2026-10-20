@@ -25,19 +25,19 @@ public sealed class GravitationalLensEffect : VideoEffectBase
     public Animation Amount { get; } = new Animation(100, 0, 100);
 
     [Display(GroupName = nameof(Texts.BlackHoleGroup), Name = nameof(Texts.PositionX), Description = nameof(Texts.PositionXDescription), Order = 10, ResourceType = typeof(Texts))]
-    [AnimationSlider("F1", "px", -1000, 1000)]
+    [AnimationSlider("F1", "px", -GravitationalLensSettings.PositionSliderPixels, GravitationalLensSettings.PositionSliderPixels)]
     public Animation PositionX { get; } = new Animation(0, -GravitationalLensSettings.MaximumPositionPixels, GravitationalLensSettings.MaximumPositionPixels);
 
     [Display(GroupName = nameof(Texts.BlackHoleGroup), Name = nameof(Texts.PositionY), Description = nameof(Texts.PositionYDescription), Order = 11, ResourceType = typeof(Texts))]
-    [AnimationSlider("F1", "px", -1000, 1000)]
+    [AnimationSlider("F1", "px", -GravitationalLensSettings.PositionSliderPixels, GravitationalLensSettings.PositionSliderPixels)]
     public Animation PositionY { get; } = new Animation(0, -GravitationalLensSettings.MaximumPositionPixels, GravitationalLensSettings.MaximumPositionPixels);
 
     [Display(GroupName = nameof(Texts.BlackHoleGroup), Name = nameof(Texts.Distance), Description = nameof(Texts.DistanceDescription), Order = 12, ResourceType = typeof(Texts))]
-    [AnimationSlider("F1", "×", 3, 1000)]
+    [AnimationSlider("F1", "×", GravitationalLensSettings.MinimumDistance, GravitationalLensSettings.MaximumDistance)]
     public Animation Distance { get; } = new Animation(100, GravitationalLensSettings.MinimumDistance, GravitationalLensSettings.MaximumDistance);
 
     [Display(GroupName = nameof(Texts.CameraGroup), Name = nameof(Texts.FieldOfView), Description = nameof(Texts.FieldOfViewDescription), Order = 20, ResourceType = typeof(Texts))]
-    [AnimationSlider("F1", "°", 10, 150)]
+    [AnimationSlider("F1", "°", GravitationalLensSettings.MinimumFieldOfViewDegrees, GravitationalLensSettings.MaximumFieldOfViewDegrees)]
     public Animation FieldOfView { get; } = new Animation(60, GravitationalLensSettings.MinimumFieldOfViewDegrees, GravitationalLensSettings.MaximumFieldOfViewDegrees);
 
     private IAnimatable[]? _animatables;
